@@ -62,16 +62,16 @@ class Widget:
 class Container(Widget):
 	def __init__(self, d):
 		Widget.__init__(self, d)
-		self.childrem = []
+		self.children = []
 
 	def add(self, child):
-		self.childrem.append(child)
+		self.children.append(child)
 
 	def get_height(self):
-		return max([c.get_height() for c in self.childrem] + [self.height])
+		return max([c.get_height() for c in self.children] + [self.height])
 
 	def get_width(self):
-		return max([c.get_width() for c in self.childrem] + [self.width])
+		return max([c.get_width() for c in self.children] + [self.width])
 
 class WButton(Widget):
 	def stl(self):
@@ -104,23 +104,23 @@ class WPassword(WEntry):
 
 class WVBox(Container):
 	def get_height(self):
-		return max([sum([c.get_height() for c in self.childrem]), self.height])
+		return max([sum([c.get_height() for c in self.children]), self.height])
 
 	def stl(self):
 		# gatinho do kpt
-		s = reduce(lambda x, y: x + y, [c.stl() for c in self.childrem])
+		s = reduce(lambda x, y: x + y, [c.stl() for c in self.children])
 		self.width = max([self.width] + [len(d) for d in s])
-		s = reduce(lambda x, y: x + y, [c.stl() for c in self.childrem])
+		s = reduce(lambda x, y: x + y, [c.stl() for c in self.children])
 		return self.centralize(s)
 
 class WHBox(Container):
 	def get_width(self):
-		return max([sum([c.get_width() for c in self.childrem]), self.width])
+		return max([sum([c.get_width() for c in self.children]), self.width])
 
 	def stl(self):
 		l = []
 		sp = 0
-		for i in self.childrem:
+		for i in self.children:
 			r = i.stl()
 			for d in range(len(r)):
 				if len(l) <= d:
@@ -294,7 +294,7 @@ class Console(object):
 			Console.instance = object.__new__(self)
 			self.last = []
 		return Console.instance
-		
+
 	def read(self, s):
 		return raw_input(s)
 
