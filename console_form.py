@@ -1,4 +1,4 @@
-﻿#!/usr/bin/python
+#!/usr/bin/env python3
 
 # Window controls for console
 
@@ -18,8 +18,8 @@ class Widget:
 		self.type = d.get('type')
 		self.value = d.get('value', '')
 		self.parent = d.get('parent')
-		self.width = d.get('width', 0) / WDIFF
-		self.height = d.get('height', 0) / HDIFF
+		self.width = int(d.get('width', 0) / WDIFF)
+		self.height = int(d.get('height', 0) / HDIFF)
 		self.description = d.get('description')
 		self.signals = dict(d.get('signals', {}))
 		self.parentw = None
@@ -53,7 +53,7 @@ class Widget:
 
 		ret = [r.center(width) for r in ret]
 		ret = ([' ' * width] * (int((self.height - len(ret))/2))) + ret
-		ret += [' ' * width] * (self.height - len(ret))
+		ret += [' ' * width] * int(self.height - len(ret))
 		return ret
 
 	def active(self, w, args):
@@ -107,7 +107,14 @@ class WVBox(Container):
 		return max([sum([c.get_height() for c in self.children]), self.height])
 
 	def stl(self):
-		# gatinho do kpt
+		def reduce(f, l):
+			if l:
+				r = l[0]
+				for i in range(1, len(l)):
+					r = f(r, l[i])
+				return r
+			return None
+
 		s = reduce(lambda x, y: x + y, [c.stl() for c in self.children])
 		self.width = max([self.width] + [len(d) for d in s])
 		s = reduce(lambda x, y: x + y, [c.stl() for c in self.children])
@@ -139,7 +146,7 @@ def make_widget(t):
 		'label': WLabel,
 		'password': WPassword
 	}
-	if not types.has_key(t):
+	if t not in types:
 		raise NotImplementedError
 	return types[t]
 
@@ -154,8 +161,8 @@ class Window:
 			'title_left': '|',
 			'title_right': '|',
 			'botton': '-',
-			'corner_11': ',',
-			'corner_12': ',',
+			'corner_11': '.',
+			'corner_12': '.',
 			'corner_21': '|',
 			'corner_22': '|',
 			'corner_31': "'",
@@ -190,7 +197,7 @@ class Window:
 			try: av = int(v[0] or self.default)
 			except: pass
 
-			if self.tree.has_key(av):
+			if av in self.tree:
 				self.tree[av].active(self, v)
 
 
@@ -201,7 +208,7 @@ class Window:
 			while ininfinite:
 				ininfinite = []
 				for i in range(len(l)):
-					if not l[i].get('parent') in self.tree.keys() + [None]:
+					if not l[i].get('parent') in list(self.tree.keys()) + [None]:
 						continue
 					g = make_widget(l[i].get('type'))(l[i])
 					ininfinite.append(i)
@@ -214,7 +221,8 @@ class Window:
 					g.parentw = self.tree[g.parent]
 					setattr(self, g.name, g)
 
-				ininfinite.sort(lambda x, y: cmp(y, x))
+				ininfinite.sort()
+				ininfinite.reverse()
 				for i in ininfinite:
 					del l[i]
 
@@ -262,7 +270,7 @@ class Window:
 	def console(self):
 		if self.modal:
 			last = self.c.last
-			s = CONSOLEY/2 - len(self.out) / 2
+			s = int(CONSOLEY/2 - len(self.out) / 2)
 			for q in range(len(self.out)):
 				last[s + q] = last[s + q].center(CONSOLEX)
 				a = self.out[q].center(CONSOLEX)
@@ -296,16 +304,16 @@ class Console(object):
 		return Console.instance
 
 	def read(self, s):
-		return raw_input(s)
+		return input(s)
 
 	def show_out(self, value):
 		for d in range(len(value)):
 			value[d] = value[d].center(CONSOLEX)
 		d = CONSOLEY - len(value)
-		value = [""]*(d/2) + value
+		value = [""]*int(d/2) + value
 		value = value + [""] * (CONSOLEY - len(value))
 		self.last = value
-		print '\n'.join(value)
+		print('\n'.join(value))
 
 if __name__ == "__main__":
 	layout = [
