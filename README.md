@@ -3,9 +3,6 @@
 An old project that draws windows by a definition.
 The original project was to draw in other frameworks too, like Qt
 
-### Python 3
-For python 3 use the `python3` branch, it will be merged soon.
-
 ### Sample:
 ```python
 layout = [
